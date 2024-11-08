@@ -1,15 +1,34 @@
 package com.sistemalib.libsystem.entities;
 
-import java.util.ArrayList;
-//import jakarta.persistence.Entity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
 
-//@Entity
+@Entity
+@Table(name = "tb_funcionarios")
+@PrimaryKeyJoinColumn(name = "usuario_id")
 public class Funcionario extends Usuario {
 //	private SistemaBiblioteca sistemaBiblioteca;
-    public Funcionario(String nome, String email, String senha, String cpf, String cargo, SistemaBiblioteca sistemaBiblioteca) {
-        super(nome, email, senha, cpf, cargo);
+	
+	private String cargo;
+	
+	public Funcionario() {
+	}
+	
+	
+    public Funcionario(String nome, String email, String senha, String cpf, String cargo) {
+        super(nome, email, senha, cpf);
 //        this.sistemaBiblioteca = sistemaBiblioteca;
+        this.cargo = cargo;
     }
+
+	public String getCargo() {
+		return cargo;
+	}
+
+	public void setCargo(String cargo) {
+		this.cargo = cargo;
+	}
 
     
 //    public Cliente buscarClientePorNome(String nome) {

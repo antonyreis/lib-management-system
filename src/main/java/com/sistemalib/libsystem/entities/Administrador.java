@@ -1,16 +1,30 @@
 package com.sistemalib.libsystem.entities;
 
-//import jakarta.persistence.Entity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.Table;
 
-//@Entity
+@Entity
+@Table(name = "tb_admins")
+@PrimaryKeyJoinColumn(name = "usuario_id")
 public class Administrador extends Usuario {
-	
+    private String cargo;
+    
 	public Administrador() {
 	}
 	
     public Administrador(String nome, String email, String senha, String cpf, String cargo) {
-        super(nome, email, senha, cpf, cargo);
+        super(nome, email, senha, cpf);
+        this.cargo = cargo;
     }
+
+	public String getCargo() {
+		return cargo;
+	}
+
+	public void setCargo(String cargo) {
+		this.cargo = cargo;
+	}
 
 //    public void cadastrarCliente(Cliente cliente) {
 //        System.out.println("Cadastrando cliente: " + cliente.getNome());

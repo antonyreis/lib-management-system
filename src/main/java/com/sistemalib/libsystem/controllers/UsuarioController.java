@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sistemalib.libsystem.entities.User;
+import com.sistemalib.libsystem.entities.Usuario;
 import com.sistemalib.libsystem.repositories.UsuarioRepository;
 
 @RestController
@@ -21,20 +21,20 @@ public class UsuarioController {
 	private UsuarioRepository repository;
 	
 	@GetMapping
-	public List<User> findAll() {
-		List<User> result = repository.findAll();
+	public List<Usuario> findAll() {
+		List<Usuario> result = repository.findAll();
 		return result;
 	}
 	
 	@GetMapping(value = "/{id}")
-	public User findById(@PathVariable Long id) {
-		User result = repository.findById(id).get();
+	public Usuario findById(@PathVariable Long id) {
+		Usuario result = repository.findById(id).get();
 		return result;
 	}
 	
 	@PostMapping
-	public User insert(@RequestBody User user) {
-		User result = repository.save(user);
+	public Usuario insert(@RequestBody Usuario user) {
+		Usuario result = repository.save(user);
 		return result;
 	}
 	

@@ -1,7 +1,2 @@
-INSERT INTO tb_department(name) VALUES ('Gestão');
-INSERT INTO tb_department(name) VALUES ('Informática');
-
-INSERT INTO tb_user(department_id, name, email) VALUES (1, 'Maria', 'maria@gmail.com');
-INSERT INTO tb_user(department_id, name, email) VALUES (1, 'Bob', 'bob@gmail.com');
-INSERT INTO tb_user(department_id, name, email) VALUES (2, 'Alex', 'alex@gmail.com');
-INSERT INTO tb_user(department_id, name, email) VALUES (2, 'Ana', 'ana@gmail.com');
+INSERT INTO tb_usuarios(nome, email, senha, cpf, cargo) VALUES ("Ana Silva", "ana@admin.com", "admin123", "123.456.789-00", "Administrador");
+INSERT INTO tb_usuarios(nome, email, senha, cpf, cargo) VALUES ("Marcos Pereira", "marcos@cliente.com", "senha123", "456.789.123-00", "Cliente");
