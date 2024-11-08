@@ -8,7 +8,9 @@ import jakarta.persistence.Table;
 @Table(name = "tb_clientes")
 @PrimaryKeyJoinColumn(name = "usuario_id")
 public class Cliente extends Usuario {
+	
     private String cargo;
+    
     private boolean status;
     
 //    private List<Livro> livrosFisicosEmprestados;
@@ -27,6 +29,10 @@ public class Cliente extends Usuario {
         return status;
     }
 
+	public void setStatus(boolean status) {
+        this.status = status;
+    }
+
     public String getCargo() {
 		return cargo;
 	}
@@ -34,10 +40,6 @@ public class Cliente extends Usuario {
 	public void setCargo(String cargo) {
 		this.cargo = cargo;
 	}
-
-	public void setStatus(boolean status) {
-        this.status = status;
-    }
 
 //    public List<Livro> getLivrosFisicosEmprestados() {
 //        return livrosFisicosEmprestados;

@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 @Table(name = "tb_admins")
 @PrimaryKeyJoinColumn(name = "usuario_id")
 public class Administrador extends Usuario {
+	
     private String cargo;
     
 	public Administrador() {

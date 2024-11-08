@@ -12,8 +12,9 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "tb_usuarios")
 @Inheritance(strategy = InheritanceType.JOINED)
+
 //@DiscriminatorColumn(name = "cargo")
-public abstract class Usuario {
+public class Usuario {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

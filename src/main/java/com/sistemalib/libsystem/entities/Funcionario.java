@@ -15,7 +15,6 @@ public class Funcionario extends Usuario {
 	public Funcionario() {
 	}
 	
-	
     public Funcionario(String nome, String email, String senha, String cpf, String cargo) {
         super(nome, email, senha, cpf);
 //        this.sistemaBiblioteca = sistemaBiblioteca;
