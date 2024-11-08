@@ -1,13 +1,30 @@
 package com.sistemalib.libsystem.entities;
 
+//import jakarta.persistence.Entity;
+//import jakarta.persistence.GeneratedValue;
+//import jakarta.persistence.GenerationType;
+//import jakarta.persistence.Id;
+//import jakarta.persistence.Inheritance;
+//import jakarta.persistence.InheritanceType;
+//import jakarta.persistence.Table;
+//
+//@Entity
+//@Table(name = "tb_usuarios")
+//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Usuario {
+	
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String nome;
     private String email;
     private String senha;
     private String cpf;
     private String cargo;
-
+    
+    public Usuario() {
+    }
+    
     // Construtor
     public Usuario(String nome, String email, String senha, String cpf, String cargo) {
         this.nome = nome;
@@ -66,20 +83,20 @@ public class Usuario {
         this.cargo = cargo;
     }
 
-    // Métodos
-    public void consultarLivrosDisponiveis(SistemaBiblioteca sistema) {
-        System.out.println("\n=== Livros Físicos Disponíveis ===");
-        for (LivroFisico livro : sistema.getLivrosFisicosCadastrados()) {
-            if (livro.isDisponivel()) {
-                System.out.println("Título: " + livro.getTitulo() + " | ISBN: " + livro.getISBN() + " | Quantidade: " + livro.getQuantidade());
-            }
-        }
-
-        System.out.println("\n=== Livros Digitais Disponíveis ===");
-        for (LivroDigital livro : sistema.getLivrosDigitaisCadastrados()) {
-            if (livro.isDisponivel()) {
-                System.out.println("Título: " + livro.getTitulo() + " | ISBN: " + livro.getISBN());
-            }
-        }
-    }
+// Métodos
+//    public void consultarLivrosDisponiveis(SistemaBiblioteca sistema) {
+//        System.out.println("\n=== Livros Físicos Disponíveis ===");
+//        for (LivroFisico livro : sistema.getLivrosFisicosCadastrados()) {
+//            if (livro.isDisponivel()) {
+//                System.out.println("Título: " + livro.getTitulo() + " | ISBN: " + livro.getISBN() + " | Quantidade: " + livro.getQuantidade());
+//            }
+//        }
+//
+//        System.out.println("\n=== Livros Digitais Disponíveis ===");
+//        for (LivroDigital livro : sistema.getLivrosDigitaisCadastrados()) {
+//            if (livro.isDisponivel()) {
+//                System.out.println("Título: " + livro.getTitulo() + " | ISBN: " + livro.getISBN());
+//            }
+//        }
+//    }
 }
