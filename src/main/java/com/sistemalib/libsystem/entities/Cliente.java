@@ -1,33 +1,45 @@
 package com.sistemalib.libsystem.entities;
 
-import java.util.List;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 
-//@Entity
+@Entity
+@Table(name = "tb_clientes")
+@PrimaryKeyJoinColumn(name = "usuario_id")
 public class Cliente extends Usuario {
-//    private boolean status;
+	
+    private String cargo;
+    
+    private boolean status;
+    
 //    private List<Livro> livrosFisicosEmprestados;
 //    private List<LivroDigital> livrosDigitaisEmprestados;
     
     public Cliente() {
     }
 
-    public Cliente(String nome, String email, String senha, String cpf, String cargo) {
-        super(nome, email, senha, cpf, cargo);
-//        this.status = status;
+    public Cliente(String nome, String email, String senha, String cpf, String cargo, boolean status) {
+        super(nome, email, senha, cpf);
+        this.cargo = cargo;
+        this.status = status;
     }
 
-//    public boolean isStatus() {
-//        return status;
-//    }
-//
-//    public void setStatus(boolean status) {
-//        this.status = status;
-//    }
+    public boolean isStatus() {
+        return status;
+    }
+
+	public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    public String getCargo() {
+		return cargo;
+	}
+
+	public void setCargo(String cargo) {
+		this.cargo = cargo;
+	}
 
 //    public List<Livro> getLivrosFisicosEmprestados() {
 //        return livrosFisicosEmprestados;

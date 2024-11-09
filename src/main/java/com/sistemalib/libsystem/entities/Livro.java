@@ -1,19 +1,28 @@
 package com.sistemalib.libsystem.entities;
 
-//import jakarta.persistence.Entity;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
-//import jakarta.persistence.Id;
-//import jakarta.persistence.Table;
-//
-//@Entity
-//@Table(name = "tb_livros")
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "tb_livros")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Livro {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     protected String titulo;
     protected String autor;
     protected String editora;
     protected int anoPublicacao;
     protected boolean disponivel;
+
+    public Livro() {
+    }
 
     public Livro(String titulo, String autor, String editora, int anoPublicacao, boolean disponivel) {
         this.titulo = titulo;
@@ -23,7 +32,15 @@ public class Livro {
         this.disponivel = disponivel;
     }
 
-    public String getTitulo() {
+    public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getTitulo() {
         return titulo;
     }
 
@@ -61,5 +78,10 @@ public class Livro {
 
     public void setDisponivel(boolean disponivel) {
         this.disponivel = disponivel;
+    }
+
+    public String toString() {
+        return "Título: " + titulo + ", Autor: " + autor + ", Editora: " + editora +
+               ", Ano de Publicação: " + anoPublicacao + ", Disponível: " + (disponivel ? "Sim" : "Não");
     }
 }
