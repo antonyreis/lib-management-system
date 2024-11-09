@@ -4,14 +4,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sistemalib.libsystem.entities.LivroFisico;
+import com.sistemalib.libsystem.entities.Usuario;
 import com.sistemalib.libsystem.entities.LivroDigital;
 import com.sistemalib.libsystem.entities.Livro;
 import com.sistemalib.libsystem.repositories.LivroRepository;
@@ -91,5 +96,27 @@ public class LivroController {
 	    return result;
 	}
 
-	
+    @PutMapping("/{id}")
+    public ResponseEntity<Livro> atualizarLivro(@PathVariable Long id, @RequestBody Livro livroAtualizado) {
+        return livroRepository.findById(id)
+                .map(livro -> {
+                    livro.setTitulo(livroAtualizado.getTitulo());
+                    livro.setAutor(livroAtualizado.getAutor());
+                    livro.setEditora(livroAtualizado.getEditora());
+                    livro.setAnoPublicacao(livroAtualizado.getAnoPublicacao());
+                    livro.setDisponivel(livroAtualizado.isDisponivel());
+                    livroRepository.save(livro);
+                    return ResponseEntity.ok(livro);
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarLivro(@PathVariable Long id) {
+        if (livroRepository.existsById(id)) {
+            livroRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 }

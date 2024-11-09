@@ -1,79 +1,84 @@
 package com.sistemalib.libsystem.entities;
+
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.sistemalib.libsystem.controllers.LivroController;
+import com.sistemalib.libsystem.controllers.UsuarioController;
+
+@Component
 public class SistemaBiblioteca {
-    private List<LivroFisico> livrosFisicosCadastrados;
-    private List<LivroDigital> livrosDigitaisCadastrados;
-    private List<Administrador> administradoresCadastrados;
-    private List<Funcionario> funcionariosCadastrados;
-    private List<Cliente> clientesCadastrados;
 
-    // Construtor
-    public SistemaBiblioteca(List<LivroFisico> livrosFisicosCadastrados, List<LivroDigital> livrosDigitaisCadastrados,
-                             List<Administrador> administradoresCadastrados, List<Funcionario> funcionariosCadastrados,
-                             List<Cliente> clientesCadastrados) {
-        this.livrosFisicosCadastrados = livrosFisicosCadastrados;
-        this.livrosDigitaisCadastrados = livrosDigitaisCadastrados;
-        this.administradoresCadastrados = administradoresCadastrados;
-        this.funcionariosCadastrados = funcionariosCadastrados;
-        this.clientesCadastrados = clientesCadastrados;
+    @Autowired
+    private UsuarioController usuarioController;
+    
+    @Autowired
+    private LivroController livroController;
+  
+    // ITERAÇÃO SOBRE USUÁRIOS E SUBCLASSES
+    
+    public Usuario cadastrarUsuario(Map<String, Object> userData) {
+        return usuarioController.insert(userData);
+    }
+    
+    public Usuario buscarUsuario(Long id) {
+        return usuarioController.findById(id);
+    }
+    
+    public Usuario atualizarUsuario(Long id, Usuario usuarioAtualizado) {
+        return usuarioController.atualizarUsuario(id, usuarioAtualizado).getBody();
+    }
+    
+    public void deletarUsuario(Long id) {
+        usuarioController.deletarUsuario(id);
+    }
+    
+    public List<Usuario> listarUsuarios() {
+        return usuarioController.findAll();
+    }
+    
+    public List<Cliente> listarClientes() {
+        return usuarioController.findAllClientes();
+    }
+    
+    public List<Funcionario> listarFuncionarios() {
+        return usuarioController.findAllFuncionarios();
+    }
+    
+    public List<Administrador> listarAdministradores() {
+        return usuarioController.findAllAdministradores();
     }
 
-    // Getters e Setters
-    public List<LivroFisico> getLivrosFisicosCadastrados() {
-        return livrosFisicosCadastrados;
-    }
+    // ITERAÇÃO SOBRE LIVROS E SUBCLASSES
 
-    public void setLivrosFisicosCadastrados(List<LivroFisico> livrosFisicosCadastrados) {
-        this.livrosFisicosCadastrados = livrosFisicosCadastrados;
+    public Livro cadastrarLivro(Map<String, Object> bookData) {
+        return livroController.insert(bookData); 
     }
-
-    public List<LivroDigital> getLivrosDigitaisCadastrados() {
-        return livrosDigitaisCadastrados;
+    
+    public Livro buscarLivro(Long id) {
+        return livroController.findById(id);
     }
-
-    public void setLivrosDigitaisCadastrados(List<LivroDigital> livrosDigitaisCadastrados) {
-        this.livrosDigitaisCadastrados = livrosDigitaisCadastrados;
+    
+    public Livro atualizarLivro(Long id, Livro livroAtualizado) {
+        return livroController.atualizarLivro(id, livroAtualizado).getBody();
     }
-
-    public List<Administrador> getAdministradoresCadastrados() {
-        return administradoresCadastrados;
+    
+    public void deletarLivro(Long id) {
+        livroController.deletarLivro(id);
     }
-
-    public void setAdministradoresCadastrados(List<Administrador> administradoresCadastrados) {
-        this.administradoresCadastrados = administradoresCadastrados;
+    
+    public List<Livro> listarLivros() {
+        return livroController.findAll();
     }
-
-    public List<Funcionario> getFuncionariosCadastrados() {
-        return funcionariosCadastrados;
+    
+    public List<LivroDigital> listarLivrosDigitais() {
+        return livroController.findAllDigital();
     }
-
-    public void setFuncionariosCadastrados(List<Funcionario> funcionariosCadastrados) {
-        this.funcionariosCadastrados = funcionariosCadastrados;
-    }
-
-    public List<Cliente> getClientesCadastrados() {
-        return clientesCadastrados;
-    }
-
-    public void setClientesCadastrados(List<Cliente> clientesCadastrados) {
-        this.clientesCadastrados = clientesCadastrados;
-    }
-
-    public List<Livro> getLivrosCadastrados() {
-        List<Livro> todosLivros = new ArrayList<>();
-        todosLivros.addAll(livrosFisicosCadastrados);
-        todosLivros.addAll(livrosDigitaisCadastrados);
-        return todosLivros;
-    }
-
-    public Livro buscarLivroPorTitulo(String titulo) {
-        for (Livro livro : getLivrosCadastrados()) {
-            if (livro.getTitulo().equalsIgnoreCase(titulo)) {
-                return livro;
-            }
-        }
-        return null;
+    
+    public List<LivroFisico> listarLivrosFisicos() {
+        return livroController.findAllFisico();
     }
 }
