@@ -1,12 +1,11 @@
-// src/App.js
 import React from "react";
-import Usuarios from "./components/Usuarios"; // Importe o componente Usuarios
+import Usuario from "./components/Usuario";
+import Login from "./pages/Login/index";
 
 const App = () => {
   return (
     <div>
-      <h1>Bem-vindo ao Sistema de Biblioteca</h1>
-      <Usuarios />
+      <Login></Login>
     </div>
   );
 };
