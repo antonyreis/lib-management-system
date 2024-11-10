@@ -1,13 +1,27 @@
-import React from "react";
-import Usuario from "./components/Usuario";
-import Login from "./pages/Login/index";
+// src/App.js
 
-const App = () => {
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Menu from "./pages/Menu";
+
+function App() {
+  const isAuthenticated = true; // Defina a lógica de autenticação
+
   return (
-    <div>
-      <Login></Login>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        
+        <Route 
+          path="/menu" 
+          element={isAuthenticated ? <Menu /> : <Navigate to="/login" />} 
+        />
+
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    </Router>
   );
-};
+}
 
 export default App;

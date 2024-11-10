@@ -1,5 +1,6 @@
 // React
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Design
 import Button from "@mui/material/Button";
@@ -11,6 +12,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 const styleSx = {
   mainBox: {
+    bgcolor: "background.paper",
     display: "flex",
     flexDirection: "column",
     height: "85vh",
@@ -19,7 +21,7 @@ const styleSx = {
     alignItems: "center",
   },
   loginBox: {
-    bgcolor: "background.paper",
+    bgcolor: "",
     boxShadow: 2,
     borderRadius: "12px",
     padding: (theme) => theme.spacing(2, 5, 2, 5),
@@ -41,20 +43,35 @@ const styleSx = {
 };
 
 export default function Login() {
+  const navigate = useNavigate(); // Hook para redirecionamento
   const [loginLoading, setLoginLoading] = useState(false);
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
 
   const checkLoginByIp = () => {
     // Função de login por IP, ainda não implementada
+    console.log("Checando login por IP...");
   };
 
   useEffect(() => {
     checkLoginByIp();
   }, []);
 
-  const onClickLoginButton = (event) => {
-    // Função de login ao clicar no botão, ainda não implementada
+  const onClickLoginButton = async (event) => {
+    event.preventDefault();
+    setLoginLoading(true);
+
+    // Simulação de uma verificação de autenticação (aqui você pode colocar a chamada à API)
+    setTimeout(() => {
+      const loginSuccess = user === "admin" && password === "password"; // Simulação de verificação
+      setLoginLoading(false);
+
+      if (loginSuccess) {
+        navigate("/menu"); // Redireciona para o menu caso o login seja bem-sucedido
+      } else {
+        alert("Login failed");
+      }
+    }, 1000); // Simulando tempo de resposta
   };
 
   const onChangeUser = (event) => {
