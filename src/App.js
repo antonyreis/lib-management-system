@@ -1,11 +1,11 @@
 import React from "react";
 import Usuario from "./components/Usuario";
+import Login from "./pages/Login/index";
 
 const App = () => {
   return (
     <div>
-      <h1>Bem-vindo ao Sistema de Biblioteca</h1>
-      <Usuario />
+      <Login></Login>
     </div>
   );
 };
