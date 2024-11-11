@@ -9,17 +9,11 @@ import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import PageWrapper from "../../structure/PageWrapper";
 import * as bookws from "../../services/bookws";
 
-// const booksList = [
-//     { titulo: "Dom Quixote", autor: "Miguel de Cervantes", editora: "Planeta", anoPublicacao: 1605, ISBN: "1234567890", tipo: "fisico" },
-//     { titulo: "1984", autor: "George Orwell", editora: "Companhia das Letras", anoPublicacao: 1949, ISBN: "2345678901", tipo: "ebook" },
-//     { titulo: "O Hobbit", autor: "J.R.R. Tolkien", editora: "HarperCollins", anoPublicacao: 1937, ISBN: "3456789012", tipo: "fisico" },
-// ];
+
 const style = {
     grid: { bgcolor: "#c6c4c4" },
     select: {
-        // ml: 2,
-        // marginRight: 2, 
-        width: "250px", 
+        width: "250px",
         '& .MuiOutlinedInput-notchedOutline': {
             borderColor: '#393536',
         },
@@ -32,6 +26,7 @@ const style = {
         '& .MuiSelect-icon': {
             color: '#393536',
         },
+        marginRight: 5,
     },
     tableContainer: { maxWidth: "80%", margin: "20px 0" },
     textfield: {
@@ -55,15 +50,52 @@ const style = {
         '& .Mui-disabled': {
             color: '#393536',
         },
-        marginLeft: 3
-    }
+        // marginLeft: 3
+    },
+    textfieldDialog: {
+        marginTop: "10px",
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                borderColor: '#393536',
+            },
+            '&:hover fieldset': {
+                borderColor: '#393536',
+            },
+            '&.Mui-focused fieldset': {
+                borderColor: '#393536',
+            },
+        },
+        '& .MuiInputLabel-root': {
+            color: '#393536',
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#393536',
+        },
+        '& .Mui-disabled': {
+            color: '#393536',
+        },
+    },
+    selectDialog: {
+        '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#393536',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#393536',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#393536',
+        },
+        '& .MuiSelect-icon': {
+            color: '#393536',
+        },
+    },
 };
 export default function Home() {
     const [updateFlag, setUpdateFlag] = useState(true);
     const [books, setBooks] = useState([]);
     const [searchResults, setSearchResults] = useState(books);
     const [bookType, setBookType] = useState("Fisico");
-    const [searchMethod, setSearchMethod] = useState("id");
+    const [searchMethod, setSearchMethod] = useState("titulo");
     const [searchValue, setSearchValue] = useState("");
     const [openAddDialog, setOpenAddDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -71,7 +103,6 @@ export default function Home() {
     const [selectedBook, setSelectedBook] = useState(null);
     const [form, setForm] = useState({ titulo: "", autor: "", editora: "", anoPublicacao: "", ISBN: "", tipo: "" });
 
-    // console.log({ books: books })
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -84,7 +115,7 @@ export default function Home() {
         };
 
         fetchBooks();
-    }, [updateFlag]);
+    }, []);
 
     useEffect(() => {
         let filteredBooks = books;
@@ -112,9 +143,17 @@ export default function Home() {
 
     const handleSearchValueChange = (event) => setSearchValue(event.target.value);
 
+    const handleOpenConfirmDeleteDialog = () => setOpenConfirmDeleteDialog(true);
+
     const handleOpenAddDialog = () => {
         setForm({ titulo: "", autor: "", editora: "", anoPublicacao: "", ISBN: "", tipo: "" });
         setOpenAddDialog(true);
+    };
+
+    const handleOpenEditDialog = (book) => {
+        setSelectedBook(book);
+        setForm(book);
+        setOpenEditDialog(true);
     };
 
     const handleCloseDialog = () => {
@@ -124,20 +163,44 @@ export default function Home() {
     };
 
     const handleAddBook = () => {
-        if (Object.values(form).every((field) => field.trim() !== "")) {
-            setBooks([...books, form]);
-            setSearchResults([...searchResults, form]);
-            alert("Livro adicionado com sucesso!");
-            handleCloseDialog();
+        const addBook = async () => {
+            try {
+                if (form.tipo === "Digital") {
+                    form.disponivel = true;
+                } else {
+                    form.quantidade = parseInt(form.quantidade, 10) || 0;
+                    form.disponivel = form.quantidade > 0;
+                }
+
+                form.anoPublicacao = parseInt(form.anoPublicacao, 10) || 0;
+                await bookws.addLivro(form);
+                setBooks([...books, form]);
+                setSearchResults([...searchResults, form]);
+
+                alert("Livro adicionado com sucesso!");
+                setForm({
+                    titulo: "",
+                    autor: "",
+                    editora: "",
+                    anoPublicacao: "",
+                    ISBN: "",
+                    tipo: "",
+                    quantidade: 0
+                });
+                window.location.reload();
+                handleCloseDialog();
+            } catch (error) {
+                console.error(error);
+                alert("Ocorreu um erro ao adicionar o livro. Verifique os campos e tente novamente.");
+            }
+        };
+
+        if (form.titulo && form.autor && form.editora && form.anoPublicacao && form.ISBN && form.tipo &&
+            (form.tipo === "Digital" || (form.tipo === "Fisico" && form.quantidade))) {
+            addBook();
         } else {
             alert("Preencha todos os campos para adicionar o livro.");
         }
-    };
-
-    const handleOpenEditDialog = (book) => {
-        setSelectedBook(book);
-        setForm(book);
-        setOpenEditDialog(true);
     };
 
     const handleUpdateBook = () => {
@@ -149,17 +212,15 @@ export default function Home() {
                 setBooks(updatedBooks);
                 setSearchResults(updatedBooks);
 
+                window.location.reload();
                 alert("Livro Atualizado com sucesso!");
             } catch (error) {
                 console.error("Erro ao atualizar livro", error);
             }
         };
         updateBook();
-        refreshBooks();
         handleCloseDialog();
     };
-
-    const handleOpenConfirmDeleteDialog = () => setOpenConfirmDeleteDialog(true);
 
     const handleDeleteBook = () => {
         const deleteBook = async () => {
@@ -169,6 +230,7 @@ export default function Home() {
                 setBooks(updatedBooks);
                 setSearchResults(updatedBooks);
 
+                window.location.reload();
                 alert("Livro excluído com sucesso!");
             } catch (error) {
                 console.error("Erro ao deletar livro", error);
@@ -194,7 +256,7 @@ export default function Home() {
                 >
                     {/* Filtro de Tipo de Livro */}
                     <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
-                        <FormControl fullWidth sx={{ ml: 2 }}>
+                        <FormControl fullWidth>
                             <InputLabel shrink
                                 sx={{
                                     color: '#393536',
@@ -239,29 +301,6 @@ export default function Home() {
                             </Select>
                         </FormControl>
                     </Box>
-
-                    {/* Filtro de Método de Busca (ID/Título) */}
-                    {/* <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
-                        <Select
-                            value={searchMethod}
-                            onChange={handleSearchMethodChange}
-                            sx={style.select}
-                            displayEmpty
-                        >
-                            <MenuItem value="id">ID</MenuItem>
-                            <MenuItem value="titulo">Título</MenuItem>
-                        </Select>
-                        <TextField
-                            sx={{ ml: 2 }}
-                            value={searchValue}
-                            onChange={handleSearchValueChange}
-                            label="Buscar"
-                            fullWidth
-                            variant="outlined"
-                        />
-                    </Box> */}
-
-                    {/* Tabela de Livros */}
                     <TableContainer component={Paper} sx={style.tableContainer}>
                         <Table>
                             <TableHead>
@@ -298,32 +337,32 @@ export default function Home() {
                             </TableBody>
                         </Table>
                     </TableContainer>
-
-                    {/* Botão de Adição */}
                     <Box
                         display="flex"
                         justifyContent="flex-end"
                         width="80%"
-                    // margin="20px 0"
                     >
                         <IconButton onClick={handleOpenAddDialog}><BookmarkAdd /></IconButton>
                     </Box>
 
-                    {/* Diálogo de Adição */}
                     <Dialog open={openAddDialog} onClose={handleCloseDialog}>
                         <DialogTitle>Adicionar Livro</DialogTitle>
                         <DialogContent sx={{ marginTop: '5px', '& > *': { marginTop: '10px' } }}>
-                            <TextField label="Título" fullWidth value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
-                            <TextField label="Autor" fullWidth value={form.autor} onChange={(e) => setForm({ ...form, autor: e.target.value })} />
-                            <TextField label="Editora" fullWidth value={form.editora} onChange={(e) => setForm({ ...form, editora: e.target.value })} />
-                            <TextField label="Ano de Publicação" fullWidth value={form.anoPublicacao} onChange={(e) => setForm({ ...form, anoPublicacao: e.target.value })} />
-                            <TextField label="ISBN" fullWidth value={form.ISBN} onChange={(e) => setForm({ ...form, ISBN: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Título" fullWidth value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Autor" fullWidth value={form.autor} onChange={(e) => setForm({ ...form, autor: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Editora" fullWidth value={form.editora} onChange={(e) => setForm({ ...form, editora: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Ano de Publicação" fullWidth value={form.anoPublicacao} onChange={(e) => setForm({ ...form, anoPublicacao: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="ISBN" fullWidth value={form.ISBN} onChange={(e) => setForm({ ...form, ISBN: e.target.value })} />
                             <FormControl fullWidth sx={{ marginTop: '10px' }}>
-                                <InputLabel>Tipo</InputLabel>
+                                <InputLabel sx={{
+                                    color: '#393536',
+                                    '&.Mui-focused': { color: '#393536' },
+                                }}>Tipo</InputLabel>
                                 <Select
+                                    sx={style.selectDialog}
                                     value={form.tipo}
                                     onChange={(e) => setForm({ ...form, tipo: e.target.value })}
-                                    label="Tipo"  // Associando o label ao Select
+                                    label="Tipo"
                                 >
                                     <MenuItem value="Fisico">Físico</MenuItem>
                                     <MenuItem value="Digital">Digital</MenuItem>
@@ -331,6 +370,7 @@ export default function Home() {
                             </FormControl>
                             {form.tipo === "Fisico" && (
                                 <TextField
+                                    sx={style.textfieldDialog}
                                     label="Quantidade"
                                     fullWidth
                                     value={form.quantidade}
@@ -344,18 +384,21 @@ export default function Home() {
                         </DialogActions>
                     </Dialog>
 
-                    {/* Diálogo de Edição */}
                     <Dialog open={openEditDialog} onClose={handleCloseDialog}>
                         <DialogTitle sx={{ margin: '5px' }}>Editar Livro</DialogTitle>
-                        <DialogContent sx={{ marginTop: '5px', '& > *': { marginTop: '10px' } }}>
-                            <TextField label="Título" fullWidth value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
-                            <TextField label="Autor" fullWidth value={form.autor} onChange={(e) => setForm({ ...form, autor: e.target.value })} />
-                            <TextField label="Editora" fullWidth value={form.editora} onChange={(e) => setForm({ ...form, editora: e.target.value })} />
-                            <TextField label="Ano de Publicação" fullWidth value={form.anoPublicacao} onChange={(e) => setForm({ ...form, anoPublicacao: e.target.value })} />
+                        <DialogContent>
+                            <TextField sx={style.textfieldDialog} label="Título" fullWidth value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Autor" fullWidth value={form.autor} onChange={(e) => setForm({ ...form, autor: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Editora" fullWidth value={form.editora} onChange={(e) => setForm({ ...form, editora: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Ano de Publicação" fullWidth value={form.anoPublicacao} onChange={(e) => setForm({ ...form, anoPublicacao: e.target.value })} />
                             {/* <TextField label="ISBN" fullWidth value={form.ISBN} onChange={(e) => setForm({ ...form, ISBN: e.target.value })} /> */}
                             <FormControl fullWidth sx={{ marginTop: '10px' }}>
-                                <InputLabel>Disponivel</InputLabel>
-                                <Select label="Disponivel" fullWidth value={form.disponivel} onChange={(e) => setForm({ ...form, disponivel: e.target.value })}>
+                                <InputLabel sx={{
+
+                                    color: '#393536',
+                                    '&.Mui-focused': { color: '#393536' },
+                                }}>Disponivel</InputLabel>
+                                <Select sx={style.selectDialog} label="Disponivel" fullWidth value={form.disponivel} onChange={(e) => setForm({ ...form, disponivel: e.target.value })}>
                                     <MenuItem value={true}>Sim</MenuItem>
                                     <MenuItem value={false}>Não</MenuItem>
                                 </Select>

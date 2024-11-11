@@ -7,17 +7,11 @@ import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import Tooltip from '@mui/material/Tooltip';
 
 // Internal
 import PageWrapper from "../../structure/PageWrapper";
-
-// Sample list of books
-const books = [
-  { titulo: "Dom Quixote", autor: "Miguel de Cervantes", editora: "Planeta", anoPublicacao: 1605, ISBN: "1234567890", tipo: "fisico" },
-  { titulo: "1984", autor: "George Orwell", editora: "Companhia das Letras", anoPublicacao: 1949, ISBN: "2345678901", tipo: "ebook" },
-  { titulo: "O Hobbit", autor: "J.R.R. Tolkien", editora: "HarperCollins", anoPublicacao: 1937, ISBN: "3456789012", tipo: "fisico" },
-  // Adicione mais livros como desejar
-];
+import * as bookws from "../../services/bookws";
 
 const style = {
   grid: Object.assign({}, window.app_config?.style?.box ?? {}, {
@@ -33,7 +27,7 @@ const style = {
         borderColor: '#393536',
       },
       '&.Mui-focused fieldset': {
-        borderColor: '#393536', 
+        borderColor: '#393536',
       },
     },
     '& .MuiInputLabel-root': {
@@ -45,28 +39,38 @@ const style = {
     '& .Mui-disabled': {
       color: '#393536',
     },
-    marginRight: "5px" 
+    marginRight: "5px"
   },
   searchButton: {
-      bgcolor: "#393536",
-      width: 150,
-      margin: "20px",
+    bgcolor: "#393536",
+    width: 150,
+    margin: "20px",
   },
 };
 
-export default function Home({ pageOptions }) {
+export default function Home() {
+  const [books, setBooks] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
-    setSearchResults(books);
+    const fetchBooks = async () => {
+      try {
+        const fetchedBooks = await bookws.getLivros();
+        setBooks(fetchedBooks);
+        setSearchResults(fetchedBooks)
+      } catch (error) {
+        console.error("Erro ao buscar livros", error);
+      }
+    };
+
+    fetchBooks();
   }, []);
 
   const handleSearch = () => {
     const results = books.filter(book =>
       book.titulo.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    console.log({sessionStorage: sessionStorage})
     setSearchResults(results);
   };
 
@@ -80,9 +84,9 @@ export default function Home({ pageOptions }) {
           width={width}
           height={height}
           sx={style.grid}
-          p={4}
+          // p={4}
         >
-          <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
+          <Box display="flex" justifyContent="center" alignItems="center" m={3}>
             <TextField
               label="Título"
               variant="outlined"
@@ -94,32 +98,50 @@ export default function Home({ pageOptions }) {
               Buscar
             </Button>
           </Box>
-
-          <Grid container justifyContent="center" alignItems="center" spacing={2}>
-            {searchResults.length > 0 ? (
-              searchResults.map((book, index) => (
-                <Grid item key={index}>
-                  <Box
-                    p={2}
-                    border="1px solid #ccc"
-                    borderRadius="4px"
-                    bgcolor="#fff"
-                  >
-                    <Typography variant="h6">{book.titulo}</Typography>
-                    <Typography>Autor: {book.autor}</Typography>
-                    <Typography>Editora: {book.editora}</Typography>
-                    <Typography>Ano de Publicação: {book.anoPublicacao}</Typography>
-                    <Typography>ISBN: {book.ISBN}</Typography>
-                    {/* <Typography>Tipo: {book.tipo}</Typography> */}
-                  </Box>
-                </Grid>
-              ))
-            ) : (
-              <Typography>Nenhum resultado encontrado.</Typography>
-            )}
-          </Grid>
-        </Box>
+          <Box
+            sx={{
+              display: "flex",
+              maxHeight: "500px",
+              overflowY: "auto",  
+              width: "95%",
+              justifyContent: "center",
+              // alignItems:"center",
+            }}
+            // mb={4}
+            // p={1}
+          >
+            <Grid container maxWidth={"80%"} spacing={4}>
+              {searchResults.length > 0 ? (
+                searchResults.map((book, index) => (
+                  <Grid item key={index}>
+                    <Box
+                      p={2}
+                      border="1px solid #ccc"
+                      borderRadius="4px"
+                      bgcolor="#fff"
+                      sx={{
+                        width: "180px",
+                        height: "200px",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography variant="h6">{book.titulo}</Typography>
+                      <Typography>Autor: {book.autor}</Typography>
+                      <Typography>Editora: {book.editora}</Typography>
+                      <Typography>Ano de Publicação: {book.anoPublicacao}</Typography>
+                      <Typography>Disponivel: {book.disponivel ? "Sim" : "Não"}</Typography>
+                    </Box>
+                  </Grid>
+                ))
+              ) : (
+                <Typography>Nenhum resultado encontrado.</Typography>
+              )}
+            </Grid>
+            </Box>
+          </Box>
       )}
-    </PageWrapper>
-  );
+        </PageWrapper>
+      );
 }
