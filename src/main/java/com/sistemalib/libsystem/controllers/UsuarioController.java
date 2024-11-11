@@ -2,6 +2,7 @@ package com.sistemalib.libsystem.controllers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sistemalib.libsystem.config.ResourceNotFoundException;
 import com.sistemalib.libsystem.entities.Administrador;
 import com.sistemalib.libsystem.entities.Cliente;
 import com.sistemalib.libsystem.entities.Funcionario;
@@ -65,6 +67,13 @@ public class UsuarioController {
 		Usuario result = usuarioRepository.findById(id).get();
 		return result;
 	}
+	
+	@GetMapping(value = "/email/{email}")
+	public Usuario findByEmail(@PathVariable String email) {
+	    Optional<Usuario> result = usuarioRepository.findByEmail(email);
+	    return result.orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com email: " + email));
+	}
+
 	
 	@PostMapping
 	public Usuario insert(@RequestBody Map<String, Object> userData) {
