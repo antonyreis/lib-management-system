@@ -21,7 +21,7 @@ const style = {
 export default function Home() {
     const [books, setBooks] = useState(booksList);
     const [searchResults, setSearchResults] = useState(books);
-    const [bookType, setBookType] = useState("");
+    const [bookType, setBookType] = useState("fisico");
     const [searchMethod, setSearchMethod] = useState("id");
     const [searchValue, setSearchValue] = useState("");
     const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -142,12 +142,13 @@ export default function Home() {
                             variant="outlined"
                         />
                         <Select
+                            defaultValue="fisico"
                             value={bookType}
                             onChange={handleTypeChange}
                             displayEmpty
                             sx={style.select}
                         >
-                            <MenuItem value="">Todos</MenuItem>
+                            {/* <MenuItem value="">Todos</MenuItem> */}
                             <MenuItem value="fisico">Físico</MenuItem>
                             <MenuItem value="ebook">Digital</MenuItem>
                         </Select>
@@ -185,6 +186,8 @@ export default function Home() {
                                     <TableCell>Ano de Publicação</TableCell>
                                     <TableCell>ISBN</TableCell>
                                     <TableCell>Tipo</TableCell>
+                                    <TableCell>Disponível</TableCell>
+                                    {bookType === "fisico" && <TableCell>Quantidade</TableCell>}
                                     <TableCell>Ações</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -197,6 +200,8 @@ export default function Home() {
                                         <TableCell>{book.anoPublicacao}</TableCell>
                                         <TableCell>{book.ISBN}</TableCell>
                                         <TableCell>{book.tipo}</TableCell>
+                                        <TableCell>{book.disponivel ? "Sim" : "Não"}</TableCell>
+                                        {book.tipo === "fisico" && <TableCell>{book.quantidade}</TableCell>}
                                         <TableCell>
                                             <IconButton onClick={() => handleOpenEditDialog(book)}>
                                                 <MoreHoriz />
