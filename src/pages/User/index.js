@@ -12,7 +12,6 @@ import * as userws from "../../services/userws";
 const style = {
     grid: { bgcolor: "#c6c4c4" },
     select: {
-        // marginTop: 1,
         width: "250px",
         '& .MuiOutlinedInput-notchedOutline': {
             borderColor: '#393536',
@@ -30,7 +29,6 @@ const style = {
     },
     tableContainer: { maxWidth: "80%", margin: "20px 0" },
     textfield: {
-        // marginTop: 1,
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
                 borderColor: '#393536',
@@ -76,8 +74,6 @@ const style = {
         },
     },
     selectDialog: {
-        // marginTop: 1,
-        // width: "250px",
         '& .MuiOutlinedInput-notchedOutline': {
             borderColor: '#393536',
         },
@@ -90,7 +86,6 @@ const style = {
         '& .MuiSelect-icon': {
             color: '#393536',
         },
-        // marginRight: 5,
     },
 };
 export default function Home() {
@@ -103,7 +98,14 @@ export default function Home() {
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openConfirmDeleteDialog, setOpenConfirmDeleteDialog] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [form, setForm] = useState({ nome: "", email: "", senha: "", cpf: "", cargo: "", status: "" });
+    const [form, setForm] = useState({ 
+        nome: "", 
+        email: "", 
+        senha: "", 
+        cpf: "", 
+        cargo: "", 
+        status: "" 
+    });
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -165,39 +167,36 @@ export default function Home() {
     const handleAddUser = () => {
         const addUser = async () => {
             try {
-                if (form.cargo === "Cliente") {
-                    form.status = true;
-                }
+                if (form.cargo === "Cliente") { form.status = true };
                 await userws.addUsuario(form);
                 setUsers([...users, form]);
                 setSearchResults([...searchResults, form]);
 
                 alert("Usuário adicionado com sucesso!");
+                window.location.reload();
             } catch (error) {
                 alert("Preencha todos os campos para adicionar o usuário.");
             }
         };
         addUser();
-        window.location.reload();
         handleCloseDialog();
     };
 
     const handleUpdateUser = () => {
         const updateUser = async () => {
             try {
-                console.log({ form: form, selectedUser: selectedUser })
                 await userws.updateUsuario(selectedUser.id, form);
-                const updatedBooks = users.filter((b) => b.id === selectedUser.id ? form : b);
-                setUsers(updatedBooks);
-                setSearchResults(updatedBooks);
+                const updatedUsers = users.map((user) => user.id === selectedUser.id ? form : user);
+                setUsers(updatedUsers);                
+                setSearchResults(updatedUsers);
 
                 alert("Usuário atualizado com sucesso!");
+                window.location.reload();
             } catch (error) {
                 console.error("Erro ao atualizar usuário", error);
             }
         };
         updateUser();
-        window.location.reload();
         handleCloseDialog();
     };
 
@@ -205,17 +204,17 @@ export default function Home() {
         const deleteUser = async () => {
             try {
                 await userws.delUsuario(selectedUser.id);
-                const updatedBooks = users.filter((b) => b.ID !== selectedUser.ID);
-                setUsers(updatedBooks);
-                setSearchResults(updatedBooks);
+                const updatedUsers = users.filter((user) => user.id !== selectedUser.id);
+                setUsers(updatedUsers);
+                setSearchResults(updatedUsers);
 
                 alert("Usuário excluído com sucesso!");
+                window.location.reload();
             } catch (error) {
                 console.error("Erro ao deletar usuário", error);
             }
         };
         deleteUser();
-        window.location.reload();
         handleCloseDialog();
     };
 
@@ -232,13 +231,9 @@ export default function Home() {
                     sx={style.grid}
                     p={4}
                 >
-                    {/* Filtro de Tipo de Usuário */}
                     <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
-                        <FormControl fullWidth>
-                            <InputLabel shrink sx={{
-                                color: '#393536',
-                                '&.Mui-focused': { color: '#393536' },
-                            }}>Método</InputLabel>
+                        <FormControl fullWidth >
+                            <InputLabel shrink sx={{ color: '#393536', '&.Mui-focused': { color: '#393536' } }}>Método</InputLabel>
                             <Select
                                 label="Método"
                                 defaultValue="Nome"
@@ -260,11 +255,7 @@ export default function Home() {
                             variant="outlined"
                         />
                         <FormControl fullWidth sx={{ ml: 2 }}>
-                            <InputLabel shrink
-                                sx={{
-                                    color: '#393536',
-                                    '&.Mui-focused': { color: '#393536' },
-                                }}> Cargo</InputLabel>
+                            <InputLabel shrink sx={{ color: '#393536', '&.Mui-focused': { color: '#393536' }}}>Cargo</InputLabel>
                             <Select
                                 label="Cargo"
                                 defaultValue="Cliente"
@@ -280,8 +271,6 @@ export default function Home() {
                             </Select>
                         </FormControl>
                     </Box>
-
-                    {/* Tabela de Usuários */}
                     <TableContainer component={Paper} sx={style.tableContainer}>
                         <Table>
                             <TableHead>
@@ -325,32 +314,31 @@ export default function Home() {
                         <IconButton onClick={handleOpenAddDialog}><PersonAdd /></IconButton>
                     </Box>
 
-                    {/* Diálogo de Adição */}
                     <Dialog open={openAddDialog} onClose={handleCloseDialog}>
                         <DialogTitle>Adicionar Usuário</DialogTitle>
                         <DialogContent>
                             {/* <Stack spacing={2}> */}
-                                <TextField sx={style.textfieldDialog} label="Nome" fullWidth value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
-                                <TextField sx={style.textfieldDialog} label="Email" fullWidth value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                                <TextField sx={style.textfieldDialog} label="Senha" fullWidth value={form.senha} onChange={(e) => setForm({ ...form, senha: e.target.value })} />
-                                <TextField sx={style.textfieldDialog} label="CPF" fullWidth value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
-                                <FormControl fullWidth sx={{ marginTop: "10px" }}>
-                                    <InputLabel shrink
+                            <TextField sx={style.textfieldDialog} label="Nome" fullWidth value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Email" fullWidth value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Senha" fullWidth value={form.senha} onChange={(e) => setForm({ ...form, senha: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="CPF" fullWidth value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
+                            <FormControl fullWidth sx={{ marginTop: "10px" }}>
+                                <InputLabel shrink
                                     sx={{
                                         color: '#393536',
                                         '&.Mui-focused': { color: '#393536' },
                                     }}>Cargo</InputLabel>
-                                    <Select
-                                        sx={style.selectDialog}
-                                        value={form.cargo}
-                                        onChange={(e) => setForm({ ...form, cargo: e.target.value })}
-                                        label="Cargo"  // Associando o label ao Select
-                                    >
-                                        <MenuItem value="Cliente">Cliente</MenuItem>
-                                        <MenuItem value="Funcionario">Funcionario</MenuItem>
-                                        <MenuItem value="Administrador">Administrador</MenuItem>
-                                    </Select>
-                                </FormControl>
+                                <Select
+                                    sx={style.selectDialog}
+                                    value={form.cargo}
+                                    onChange={(e) => setForm({ ...form, cargo: e.target.value })}
+                                    label="Cargo" 
+                                >
+                                    <MenuItem value="Cliente">Cliente</MenuItem>
+                                    <MenuItem value="Funcionario">Funcionario</MenuItem>
+                                    <MenuItem value="Administrador">Administrador</MenuItem>
+                                </Select>
+                            </FormControl>
                             {/* </Stack> */}
                         </DialogContent>
                         <DialogActions>
@@ -359,14 +347,13 @@ export default function Home() {
                         </DialogActions>
                     </Dialog>
 
-                    {/* Diálogo de Edição */}
                     <Dialog open={openEditDialog} onClose={handleCloseDialog}>
                         <DialogTitle>Editar Usuário</DialogTitle>
                         <DialogContent>
-                        <TextField sx={style.textfieldDialog} label="Nome" fullWidth value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
-                                <TextField sx={style.textfieldDialog} label="Email" fullWidth value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                                <TextField sx={style.textfieldDialog} label="Senha" fullWidth value={form.senha} onChange={(e) => setForm({ ...form, senha: e.target.value })} />
-                                <TextField sx={style.textfieldDialog} label="CPF" fullWidth value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Nome" fullWidth value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Email" fullWidth value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="Senha" fullWidth value={form.senha} onChange={(e) => setForm({ ...form, senha: e.target.value })} />
+                            <TextField sx={style.textfieldDialog} label="CPF" fullWidth value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleCloseDialog}>Voltar</Button>

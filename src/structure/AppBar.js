@@ -8,10 +8,12 @@ import { deepOrange } from "@mui/material/colors";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Bookmarks from '@mui/icons-material/Bookmarks';
 import AccessibilityIcon from '@mui/icons-material/Accessibility';
+import Search from '@mui/icons-material/Search';
 
 // Third-party
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Tooltip } from "@mui/material";
 
 const HOME_URL = "/menu";
 
@@ -78,13 +80,18 @@ export default function CustomAppBar() {
     navigate("/user")
   };
 
-  const handleClickProfileSettings = () => {
-    // navigate("/app/user-settings");
-  };
+  // const handleClickProfileSettings = () => {
+  //   navigate("/app/user-settings");
+  // };
 
   const handleClickLogout = () => {
-    sessionStorage.setItem("isAuthenticated", "false");
+    // sessionStorage.setItem("isAuthenticated", "false");
     navigate("/login");
+  };
+
+  const handleClickMenu = () => {
+    // sessionStorage.setItem("isAuthenticated", "false");
+    navigate("/menu");
   };
 
   const userData = JSON.parse(sessionStorage.getItem("usuario") || {})
@@ -92,20 +99,33 @@ export default function CustomAppBar() {
   return (
     <>
       <div style={style.appBar}>
+        <div style={style.appBarFirstBox}>
+          <Tooltip title="Menu Principal" arrow>
+            <IconButton onClick={handleClickMenu} sx={style.avatar}>
+              <Search />
+            </IconButton>
+          </Tooltip>
+        </div>
         <div style={style.appBarThirdBox}>
           {(userData.cargo === "Administrador") && (
-            <IconButton onClick={handleClickUser} sx={style.avatar}>
-              <AccessibilityIcon />
-            </IconButton>
+            <Tooltip title="Central de Usuários" arrow>
+              <IconButton onClick={handleClickUser} sx={style.avatar}>
+                <AccessibilityIcon />
+              </IconButton>
+            </Tooltip>
           )}
           {(userData.cargo !== "Cliente") && (
-            <IconButton onClick={handleClickBookmark} sx={style.avatar}>
-              <Bookmarks />
-            </IconButton>
+            <Tooltip title="Central de Livros" arrow>
+              <IconButton onClick={handleClickBookmark} sx={style.avatar}>
+                <Bookmarks />
+              </IconButton>
+            </Tooltip>
           )}
-          <IconButton onClick={handleClickAvatar} sx={style.avatar}>
-            <AccountCircleIcon />
-          </IconButton>
+          <Tooltip title="Meu Perfil" arrow>
+            <IconButton onClick={handleClickAvatar} sx={style.avatar}>
+              <AccountCircleIcon />
+            </IconButton>
+          </Tooltip>
         </div>
       </div>
       <Menu
@@ -123,9 +143,9 @@ export default function CustomAppBar() {
         onClose={handleCloseAvatarMenu}
         id="avatar-button"
       >
-        <MenuItem onClick={handleClickProfileSettings}>
+        {/* <MenuItem onClick={handleClickProfileSettings}>
           User Settings
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleClickLogout}>Logout</MenuItem>
       </Menu>
     </>
