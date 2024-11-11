@@ -2,26 +2,28 @@ import React, { useState, useEffect } from "react";
 import {
     Box, Button, TextField, Select, MenuItem, IconButton, Dialog,
     DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, Paper
+    TableContainer, TableHead, TableRow, Paper, FormControl, InputLabel
 } from "@mui/material";
 import BookmarkAdd from "@mui/icons-material/BookmarkAdd";
 import MoreHoriz from "@mui/icons-material/MoreHoriz";
 import PageWrapper from "../../structure/PageWrapper";
+import * as bookws from "../../services/bookws";
 
-const booksList = [
-    { titulo: "Dom Quixote", autor: "Miguel de Cervantes", editora: "Planeta", anoPublicacao: 1605, ISBN: "1234567890", tipo: "fisico" },
-    { titulo: "1984", autor: "George Orwell", editora: "Companhia das Letras", anoPublicacao: 1949, ISBN: "2345678901", tipo: "ebook" },
-    { titulo: "O Hobbit", autor: "J.R.R. Tolkien", editora: "HarperCollins", anoPublicacao: 1937, ISBN: "3456789012", tipo: "fisico" },
-];
+// const booksList = [
+//     { titulo: "Dom Quixote", autor: "Miguel de Cervantes", editora: "Planeta", anoPublicacao: 1605, ISBN: "1234567890", tipo: "fisico" },
+//     { titulo: "1984", autor: "George Orwell", editora: "Companhia das Letras", anoPublicacao: 1949, ISBN: "2345678901", tipo: "ebook" },
+//     { titulo: "O Hobbit", autor: "J.R.R. Tolkien", editora: "HarperCollins", anoPublicacao: 1937, ISBN: "3456789012", tipo: "fisico" },
+// ];
 const style = {
     grid: { bgcolor: "#c6c4c4" },
     select: { marginRight: 2, width: "200px", ml: 2 },
     tableContainer: { maxWidth: "80%", margin: "20px 0" },
 };
 export default function Home() {
-    const [books, setBooks] = useState(booksList);
+    const [updateFlag, setUpdateFlag] = useState(true);
+    const [books, setBooks] = useState([]);
     const [searchResults, setSearchResults] = useState(books);
-    const [bookType, setBookType] = useState("fisico");
+    const [bookType, setBookType] = useState("Fisico");
     const [searchMethod, setSearchMethod] = useState("id");
     const [searchValue, setSearchValue] = useState("");
     const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -30,18 +32,31 @@ export default function Home() {
     const [selectedBook, setSelectedBook] = useState(null);
     const [form, setForm] = useState({ titulo: "", autor: "", editora: "", anoPublicacao: "", ISBN: "", tipo: "" });
 
+    // console.log({ books: books })
+
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                const fetchedBooks = await bookws.getLivros();
+                setBooks(fetchedBooks);
+            } catch (error) {
+                console.error("Erro ao buscar livros", error);
+            }
+        };
+
+        fetchBooks();
+    }, [updateFlag]);
+
     useEffect(() => {
         let filteredBooks = books;
 
-        // Filtrando por tipo de livro
         if (bookType) {
             filteredBooks = filteredBooks.filter((book) => book.tipo === bookType);
         }
 
-        // Filtrando pelo método de busca (ID ou título)
         if (searchValue.trim() !== "") {
             if (searchMethod === "id") {
-                filteredBooks = filteredBooks.filter((book) => book.ISBN.includes(searchValue));
+                filteredBooks = filteredBooks.filter((book) => book.isbn.includes(searchValue));
             } else if (searchMethod === "titulo") {
                 filteredBooks = filteredBooks.filter((book) => book.titulo.toLowerCase().includes(searchValue.toLowerCase()));
             }
@@ -50,27 +65,25 @@ export default function Home() {
         setSearchResults(filteredBooks);
     }, [bookType, searchMethod, searchValue, books]);
 
+    const refreshBooks = () => {setUpdateFlag((prevFlag) => !prevFlag)};
+
     const handleTypeChange = (event) => setBookType(event.target.value);
-    // Novo método para alterar o método de busca (ID ou Título)
+
     const handleSearchMethodChange = (event) => setSearchMethod(event.target.value);
 
-    // Novo método para atualizar o valor da busca
     const handleSearchValueChange = (event) => setSearchValue(event.target.value);
 
-    // Abrir diálogo de adição de livro
     const handleOpenAddDialog = () => {
         setForm({ titulo: "", autor: "", editora: "", anoPublicacao: "", ISBN: "", tipo: "" });
         setOpenAddDialog(true);
     };
 
-    // Fechar diálogos
     const handleCloseDialog = () => {
         setOpenAddDialog(false);
         setOpenEditDialog(false);
         setOpenConfirmDeleteDialog(false);
     };
 
-    // Adicionar um livro novo
     const handleAddBook = () => {
         if (Object.values(form).every((field) => field.trim() !== "")) {
             setBooks([...books, form]);
@@ -82,33 +95,51 @@ export default function Home() {
         }
     };
 
-    // Abrir diálogo de edição com as informações do livro selecionado
     const handleOpenEditDialog = (book) => {
         setSelectedBook(book);
         setForm(book);
         setOpenEditDialog(true);
     };
 
-    // Atualizar o livro existente
     const handleUpdateBook = () => {
-        const updatedBooks = books.map((b) => (b.ISBN === selectedBook.ISBN ? form : b));
-        setBooks(updatedBooks);
-        setSearchResults(updatedBooks);
-        alert("Livro atualizado com sucesso!");
+        const updateBook = async () => {
+            try {
+                console.log({ form: form, selectedBook: selectedBook })
+                await bookws.updateLivro(selectedBook.id, form);
+                const updatedBooks = books.filter((b) => b.ISBN === selectedBook.isbn ? form : b);
+                setBooks(updatedBooks);
+                setSearchResults(updatedBooks);
+
+                alert("Livro Atualizado com sucesso!");
+            } catch (error) {
+                console.error("Erro ao atualizar livro", error);
+            }
+        };
+        updateBook();
+        refreshBooks();
         handleCloseDialog();
     };
 
-    // Abrir diálogo de confirmação para exclusão de livro
     const handleOpenConfirmDeleteDialog = () => setOpenConfirmDeleteDialog(true);
 
-    // Confirmar exclusão do livro
     const handleDeleteBook = () => {
-        const updatedBooks = books.filter((b) => b.ISBN !== selectedBook.ISBN);
-        setBooks(updatedBooks);
-        setSearchResults(updatedBooks);
-        alert("Livro excluído com sucesso!");
+        const deleteBook = async () => {
+            try {
+                await bookws.delLivro(selectedBook.id);
+                const updatedBooks = books.filter((b) => b.ISBN !== selectedBook.ISBN);
+                setBooks(updatedBooks);
+                setSearchResults(updatedBooks);
+
+                alert("Livro excluído com sucesso!");
+            } catch (error) {
+                console.error("Erro ao deletar livro", error);
+            }
+        };
+        deleteBook();
+        refreshBooks();
         handleCloseDialog();
     };
+
 
     return (
         <PageWrapper>
@@ -142,15 +173,15 @@ export default function Home() {
                             variant="outlined"
                         />
                         <Select
-                            defaultValue="fisico"
+                            defaultValue="Fisico"
                             value={bookType}
                             onChange={handleTypeChange}
                             displayEmpty
                             sx={style.select}
                         >
                             {/* <MenuItem value="">Todos</MenuItem> */}
-                            <MenuItem value="fisico">Físico</MenuItem>
-                            <MenuItem value="ebook">Digital</MenuItem>
+                            <MenuItem value="Fisico">Físico</MenuItem>
+                            <MenuItem value="Digital">Digital</MenuItem>
                         </Select>
                     </Box>
 
@@ -187,7 +218,7 @@ export default function Home() {
                                     <TableCell>ISBN</TableCell>
                                     <TableCell>Tipo</TableCell>
                                     <TableCell>Disponível</TableCell>
-                                    {bookType === "fisico" && <TableCell>Quantidade</TableCell>}
+                                    {bookType === "Fisico" && <TableCell>Quantidade</TableCell>}
                                     <TableCell>Ações</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -198,10 +229,10 @@ export default function Home() {
                                         <TableCell>{book.autor}</TableCell>
                                         <TableCell>{book.editora}</TableCell>
                                         <TableCell>{book.anoPublicacao}</TableCell>
-                                        <TableCell>{book.ISBN}</TableCell>
+                                        <TableCell>{book.isbn}</TableCell>
                                         <TableCell>{book.tipo}</TableCell>
                                         <TableCell>{book.disponivel ? "Sim" : "Não"}</TableCell>
-                                        {book.tipo === "fisico" && <TableCell>{book.quantidade}</TableCell>}
+                                        {book.tipo === "Fisico" && <TableCell>{book.quantidade}</TableCell>}
                                         <TableCell>
                                             <IconButton onClick={() => handleOpenEditDialog(book)}>
                                                 <MoreHoriz />
@@ -232,10 +263,25 @@ export default function Home() {
                             <TextField label="Editora" fullWidth value={form.editora} onChange={(e) => setForm({ ...form, editora: e.target.value })} />
                             <TextField label="Ano de Publicação" fullWidth value={form.anoPublicacao} onChange={(e) => setForm({ ...form, anoPublicacao: e.target.value })} />
                             <TextField label="ISBN" fullWidth value={form.ISBN} onChange={(e) => setForm({ ...form, ISBN: e.target.value })} />
-                            <Select fullWidth value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
-                                <MenuItem value="fisico">Físico</MenuItem>
-                                <MenuItem value="ebook">Digital</MenuItem>
-                            </Select>
+                            <FormControl fullWidth sx={{ marginTop: '10px' }}>
+                                <InputLabel>Tipo</InputLabel>
+                                <Select
+                                    value={form.tipo}
+                                    onChange={(e) => setForm({ ...form, tipo: e.target.value })}
+                                    label="Tipo"  // Associando o label ao Select
+                                >
+                                    <MenuItem value="Fisico">Físico</MenuItem>
+                                    <MenuItem value="Digital">Digital</MenuItem>
+                                </Select>
+                            </FormControl>
+                            {form.tipo === "Fisico" && (
+                                <TextField
+                                    label="Quantidade"
+                                    fullWidth
+                                    value={form.quantidade}
+                                    onChange={(e) => setForm({ ...form, quantidade: e.target.value })}
+                                />
+                            )}
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleCloseDialog}>Voltar</Button>
@@ -251,11 +297,14 @@ export default function Home() {
                             <TextField label="Autor" fullWidth value={form.autor} onChange={(e) => setForm({ ...form, autor: e.target.value })} />
                             <TextField label="Editora" fullWidth value={form.editora} onChange={(e) => setForm({ ...form, editora: e.target.value })} />
                             <TextField label="Ano de Publicação" fullWidth value={form.anoPublicacao} onChange={(e) => setForm({ ...form, anoPublicacao: e.target.value })} />
-                            <TextField label="ISBN" fullWidth value={form.ISBN} onChange={(e) => setForm({ ...form, ISBN: e.target.value })} />
-                            <Select fullWidth value={form.tipo} onChange={(e) => setForm({ ...form, tipo: e.target.value })}>
-                                <MenuItem value="fisico">Físico</MenuItem>
-                                <MenuItem value="ebook">Digital</MenuItem>
-                            </Select>
+                            {/* <TextField label="ISBN" fullWidth value={form.ISBN} onChange={(e) => setForm({ ...form, ISBN: e.target.value })} /> */}
+                            <FormControl fullWidth sx={{ marginTop: '10px' }}>
+                                <InputLabel>Disponivel</InputLabel>
+                                <Select label="Disponivel" fullWidth value={form.disponivel} onChange={(e) => setForm({ ...form, disponivel: e.target.value })}>
+                                    <MenuItem value={true}>Sim</MenuItem>
+                                    <MenuItem value={false}>Não</MenuItem>
+                                </Select>
+                            </FormControl>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleCloseDialog}>Voltar</Button>
