@@ -1,3 +1,5 @@
+// src/services/userws.js
+
 import axios from "axios";
 
 const API_URL = "http://localhost:8080/users";
@@ -43,7 +45,21 @@ export const getFuncionarios = async () => {
 
 export const getUsuarioById = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/${id}`);
+    const idLong = parseInt(id,10);
+    if (isNaN(idLong)) {
+      throw new Error("ID Inválido")
+    }
+    const response = await axios.get(`${API_URL}/${idLong}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar usuário", error);
+    throw error;
+  }
+};
+
+export const getUsuarioByEmail = async (email) => {
+  try {
+    const response = await axios.get(`${API_URL}/email/${email}`);
     return response.data;
   } catch (error) {
     console.error("Erro ao buscar usuário", error);

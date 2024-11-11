@@ -1,6 +1,7 @@
 // React
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getUsuarioByEmail, getUsuarioById } from "../../services/userws";
 
 // Design
 import Button from "@mui/material/Button";
@@ -12,16 +13,16 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 const styleSx = {
   mainBox: {
-    bgcolor: "background.paper",
+    bgcolor: "#393536",
     display: "flex",
     flexDirection: "column",
-    height: "85vh",
+    height: "100vh",
     width: "100vw",
     justifyContent: "center",
     alignItems: "center",
   },
   loginBox: {
-    bgcolor: "",
+    bgcolor: "#c6c4c4",
     boxShadow: 2,
     borderRadius: "12px",
     padding: (theme) => theme.spacing(2, 5, 2, 5),
@@ -36,9 +37,31 @@ const styleSx = {
   },
   textfield: {
     width: 300,
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: '#393536',
+      },
+      '&:hover fieldset': {
+        borderColor: '#393536',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#393536', 
+      },
+    },
+    '& .MuiInputLabel-root': {
+      color: '#393536',
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: '#393536',
+    },
+    '& .Mui-disabled': {
+      color: '#393536',
+    },
   },
   loginButton: {
+    bgcolor: "#393536",
     width: 300,
+    margin: "3px",
   },
 };
 
@@ -61,17 +84,29 @@ export default function Login() {
     event.preventDefault();
     setLoginLoading(true);
 
-    // Simulação de uma verificação de autenticação (aqui você pode colocar a chamada à API)
-    setTimeout(() => {
-      const loginSuccess = user === "admin" && password === "password"; // Simulação de verificação
-      setLoginLoading(false);
-
-      if (loginSuccess) {
-        navigate("/menu"); // Redireciona para o menu caso o login seja bem-sucedido
-      } else {
-        alert("Login failed");
+    const handleLogin = async () => {
+      try {
+        let data = await getUsuarioByEmail(user);
+        const loginSuccess = data && data?.senha === password;
+        setLoginLoading(false);
+  
+        if (loginSuccess) {
+          sessionStorage.setItem("usuario", JSON.stringify(data));
+          // console.log({sessionStorage: sessionStorage});
+          navigate("/menu"); 
+        } else {
+          alert("Usuário ou senha inválidos. Tente novamente.");
+        }
+      } catch (error) {
+        setLoginLoading(false);
+        console.error("Erro ao autenticar", error); 
+        alert("Erro ao autenticar. Tente novamente."); 
       }
-    }, 1000); // Simulando tempo de resposta
+    };
+
+    // setTimeout(() => {
+      handleLogin();
+    // }, 1000);
   };
 
   const onChangeUser = (event) => {
