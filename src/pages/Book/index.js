@@ -16,8 +16,47 @@ import * as bookws from "../../services/bookws";
 // ];
 const style = {
     grid: { bgcolor: "#c6c4c4" },
-    select: { marginRight: 2, width: "200px", ml: 2 },
+    select: {
+        // ml: 2,
+        // marginRight: 2, 
+        width: "250px", 
+        '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#393536',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#393536',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#393536',
+        },
+        '& .MuiSelect-icon': {
+            color: '#393536',
+        },
+    },
     tableContainer: { maxWidth: "80%", margin: "20px 0" },
+    textfield: {
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                borderColor: '#393536',
+            },
+            '&:hover fieldset': {
+                borderColor: '#393536',
+            },
+            '&.Mui-focused fieldset': {
+                borderColor: '#393536',
+            },
+        },
+        '& .MuiInputLabel-root': {
+            color: '#393536',
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#393536',
+        },
+        '& .Mui-disabled': {
+            color: '#393536',
+        },
+        marginLeft: 3
+    }
 };
 export default function Home() {
     const [updateFlag, setUpdateFlag] = useState(true);
@@ -65,7 +104,7 @@ export default function Home() {
         setSearchResults(filteredBooks);
     }, [bookType, searchMethod, searchValue, books]);
 
-    const refreshBooks = () => {setUpdateFlag((prevFlag) => !prevFlag)};
+    const refreshBooks = () => { setUpdateFlag((prevFlag) => !prevFlag) };
 
     const handleTypeChange = (event) => setBookType(event.target.value);
 
@@ -155,34 +194,50 @@ export default function Home() {
                 >
                     {/* Filtro de Tipo de Livro */}
                     <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
-                        <Select
-                            value={searchMethod}
-                            onChange={handleSearchMethodChange}
-                            sx={style.select}
-                            displayEmpty
-                        >
-                            <MenuItem value="id">ID</MenuItem>
-                            <MenuItem value="titulo">Título</MenuItem>
-                        </Select>
+                        <FormControl fullWidth sx={{ ml: 2 }}>
+                            <InputLabel shrink
+                                sx={{
+                                    color: '#393536',
+                                    '&.Mui-focused': { color: '#393536' },
+                                }}> Método</InputLabel>
+                            <Select
+                                label="Método"
+                                value={searchMethod}
+                                onChange={handleSearchMethodChange}
+                                sx={style.select}
+                                displayEmpty
+                            >
+                                <MenuItem value="id">ID</MenuItem>
+                                <MenuItem value="titulo">Título</MenuItem>
+                            </Select>
+                        </FormControl>
                         <TextField
-                            // sx={{ ml: 2 }}
+                            sx={style.textfield}
                             value={searchValue}
                             onChange={handleSearchValueChange}
                             label="Buscar"
                             fullWidth
                             variant="outlined"
                         />
-                        <Select
-                            defaultValue="Fisico"
-                            value={bookType}
-                            onChange={handleTypeChange}
-                            displayEmpty
-                            sx={style.select}
-                        >
-                            {/* <MenuItem value="">Todos</MenuItem> */}
-                            <MenuItem value="Fisico">Físico</MenuItem>
-                            <MenuItem value="Digital">Digital</MenuItem>
-                        </Select>
+                        <FormControl fullWidth sx={{ ml: 2 }}>
+                            <InputLabel shrink
+                                sx={{
+                                    color: '#393536',
+                                    '&.Mui-focused': { color: '#393536' },
+                                }}> Tipo</InputLabel>
+                            <Select
+                                label="Tipo"
+                                defaultValue="Fisico"
+                                value={bookType}
+                                onChange={handleTypeChange}
+                                displayEmpty
+                                sx={style.select}
+                            >
+                                {/* <MenuItem value="">Todos</MenuItem> */}
+                                <MenuItem value="Fisico">Físico</MenuItem>
+                                <MenuItem value="Digital">Digital</MenuItem>
+                            </Select>
+                        </FormControl>
                     </Box>
 
                     {/* Filtro de Método de Busca (ID/Título) */}
