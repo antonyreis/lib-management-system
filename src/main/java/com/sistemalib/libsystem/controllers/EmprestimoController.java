@@ -74,6 +74,27 @@ public class EmprestimoController {
 
         return ResponseEntity.ok("Empréstimo registrado com sucesso.");
     }
+    
+    @PutMapping("/devolver/{emprestimoId}")
+    public ResponseEntity<String> devolverLivro(@PathVariable Long emprestimoId) {
+        Emprestimo emprestimo = emprestimoRepository.findById(emprestimoId)
+                .orElseThrow(() -> new IllegalArgumentException("Empréstimo não encontrado"));
+
+        if (emprestimo.getDataDevolucaoReal() != null) {
+            return ResponseEntity.badRequest().body("Este livro já foi devolvido.");
+        }
+
+        emprestimo.setDataDevolucaoReal(LocalDate.now());
+
+        Livro livro = emprestimo.getLivro();
+        livro.setDisponivel(true);
+        livroRepository.save(livro);
+
+        emprestimoRepository.save(emprestimo);
+
+        return ResponseEntity.ok("Livro devolvido com sucesso.");
+    }
+
 
     @GetMapping
     public List<Emprestimo> listarEmprestimos() {
