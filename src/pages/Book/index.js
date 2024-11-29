@@ -101,7 +101,7 @@ export default function Home() {
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openConfirmDeleteDialog, setOpenConfirmDeleteDialog] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
-    const [form, setForm] = useState({ titulo: "", autor: "", editora: "", anoPublicacao: "", ISBN: "", tipo: "" });
+    const [form, setForm] = useState({ titulo: "", autor: "", editora: "", anoPublicacao: "", ISBN: "", tipo: "", imgURL: "" });
 
 
     useEffect(() => {
@@ -146,7 +146,7 @@ export default function Home() {
     const handleOpenConfirmDeleteDialog = () => setOpenConfirmDeleteDialog(true);
 
     const handleOpenAddDialog = () => {
-        setForm({ titulo: "", autor: "", editora: "", anoPublicacao: "", ISBN: "", tipo: "" });
+        setForm({ titulo: "", autor: "", editora: "", anoPublicacao: "", ISBN: "", tipo: "", imgURL: "" });
         setOpenAddDialog(true);
     };
 
@@ -185,6 +185,7 @@ export default function Home() {
                     anoPublicacao: "",
                     ISBN: "",
                     tipo: "",
+                    imgURL: "",
                     quantidade: 0
                 });
                 window.location.reload();
@@ -353,6 +354,23 @@ export default function Home() {
                             <TextField sx={style.textfieldDialog} label="Editora" fullWidth value={form.editora} onChange={(e) => setForm({ ...form, editora: e.target.value })} />
                             <TextField sx={style.textfieldDialog} label="Ano de Publicação" fullWidth value={form.anoPublicacao} onChange={(e) => setForm({ ...form, anoPublicacao: e.target.value })} />
                             <TextField sx={style.textfieldDialog} label="ISBN" fullWidth value={form.ISBN} onChange={(e) => setForm({ ...form, ISBN: e.target.value })} />
+                            <TextField
+                                type="file"
+                                sx={style.textfieldDialog}
+                                label="Imagem do Livro"
+                                InputLabelProps={{ shrink: true }}
+                                fullWidth
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        const imgURL = URL.createObjectURL(file); // URL temporária
+                                        setForm({ ...form, imgURL });
+                                        // Aqui você pode fazer um upload para o servidor ou salvar localmente
+                                        console.log("Imagem selecionada:", file.name);
+                                        console.log("URL DA IMAGEM: ", imgURL)
+                                    }
+                                }}
+                            />
                             <FormControl fullWidth sx={{ marginTop: '10px' }}>
                                 <InputLabel sx={{
                                     color: '#393536',
