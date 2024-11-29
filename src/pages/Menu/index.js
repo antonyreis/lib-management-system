@@ -1,14 +1,21 @@
-// React
 import React, { useState, useMemo, useEffect } from "react";
+import Slider from "react-slick";
 
 // Design
 import Box from "@mui/material/Box";
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import Tooltip from '@mui/material/Tooltip';
-
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import "./index.css"
 // Internal
 import PageWrapper from "../../structure/PageWrapper";
 import * as bookws from "../../services/bookws";
@@ -46,19 +53,78 @@ const style = {
     width: 150,
     margin: "20px",
   },
+  bookBox: {
+    width: "120px",        // Aumentando a largura da box
+    height: "450px",       // Ajustando a altura da box
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "center",
+    textAlign: "center",
+    // margin: "0 20px",      // Ajustando o espaçamento lateral entre os itens
+    cursor: "pointer",
+    // border: "1px solid #ccc",
+    borderRadius: "4px",
+    bgcolor: "#D3D3D3"
+  },
+  bookImage: {
+    maxHeight: "90%",
+    width: "100%",          // A imagem ocupará toda a largura da box
+    height: "auto",         // A altura será ajustada automaticamente para manter a proporção
+    objectFit: "contain",   // A imagem se ajustará dentro da box, sem cortar e mantendo as proporções
+    borderRadius: "4px",
+  },
+
+  bookTitle: {
+    paddingTop: "10px",
+    fontSize: "16px",
+    // fontWeight: "bold",
+  },
+  dialogContent: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  dialogImage: {
+    width: "30%",
+    marginRight: "20px",
+  },
+  dialogText: {
+    width: "65%",
+  },
+  dialogButton: {
+    margin: "10px",
+  },
 };
 
 export default function Home() {
   const [books, setBooks] = useState([]);
+  const [searchMethod, setSearchMethod] = useState("titulo");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
+  
+  useEffect(() => {
+    let filteredBooks = books;
+
+    if (searchValue.trim() !== "") {
+        if (searchMethod === "id") {
+            filteredBooks = filteredBooks.filter((book) => book.isbn.includes(searchValue));
+        } else if (searchMethod === "titulo") {
+            filteredBooks = filteredBooks.filter((book) => book.titulo.toLowerCase().includes(searchValue.toLowerCase()));
+        }
+    }
+
+    setSearchResults(filteredBooks);
+}, [searchMethod, searchValue, books]);
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
         const fetchedBooks = await bookws.getLivros();
         setBooks(fetchedBooks);
-        setSearchResults(fetchedBooks)
+        setSearchResults(fetchedBooks);
       } catch (error) {
         console.error("Erro ao buscar livros", error);
       }
@@ -74,6 +140,46 @@ export default function Home() {
     setSearchResults(results);
   };
 
+  const handleSearchMethodChange = (event) => setSearchMethod(event.target.value);
+
+  const handleBookClick = (book) => {
+    setSelectedBook(book);
+  };
+
+  const handleCloseDialog = () => {
+    setSelectedBook(null);
+  };
+
+  const handleRequestBook = () => {
+    console.log("Solicitar livro:", selectedBook);
+    // Aqui você pode implementar a lógica para solicitar o livro
+  };
+
+  const sliderSettings = {
+    useCSS: true,
+    dots: true,
+    infinite: false,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+
   return (
     <PageWrapper>
       {({ width, height }) => (
@@ -84,9 +190,25 @@ export default function Home() {
           width={width}
           height={height}
           sx={style.grid}
-          // p={4}
         >
           <Box display="flex" justifyContent="center" alignItems="center" m={3}>
+            {/* <FormControl fullWidth>
+              <InputLabel shrink
+                sx={{
+                  color: '#393536',
+                  '&.Mui-focused': { color: '#393536' },
+                }}> Método</InputLabel>
+              <Select
+                label="Método"
+                value={searchMethod}
+                onChange={handleSearchMethodChange}
+                sx={style.select}
+                displayEmpty
+              >
+                <MenuItem value="id">ID</MenuItem>
+                <MenuItem value="titulo">Título</MenuItem>
+              </Select>
+            </FormControl> */}
             <TextField
               label="Título"
               variant="outlined"
@@ -98,50 +220,73 @@ export default function Home() {
               Buscar
             </Button>
           </Box>
-          <Box
-            sx={{
-              display: "flex",
-              maxHeight: "500px",
-              overflowY: "auto",  
-              width: "95%",
-              justifyContent: "center",
-              // alignItems:"center",
-            }}
-            // mb={4}
-            // p={1}
-          >
-            <Grid container maxWidth={"80%"} spacing={4}>
-              {searchResults.length > 0 ? (
-                searchResults.map((book, index) => (
-                  <Grid item key={index}>
-                    <Box
-                      p={2}
-                      border="1px solid #ccc"
-                      borderRadius="4px"
-                      bgcolor="#fff"
-                      sx={{
-                        width: "180px",
-                        height: "200px",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <Typography variant="h6">{book.titulo}</Typography>
-                      <Typography>Autor: {book.autor}</Typography>
-                      <Typography>Editora: {book.editora}</Typography>
-                      <Typography>Ano de Publicação: {book.anoPublicacao}</Typography>
-                      <Typography>Disponivel: {book.disponivel ? "Sim" : "Não"}</Typography>
-                    </Box>
-                  </Grid>
-                ))
-              ) : (
-                <Typography>Nenhum resultado encontrado.</Typography>
-              )}
-            </Grid>
-            </Box>
+
+          <Box sx={{ width: "90%", mt: 4 }}>
+            {searchResults.length > 0 ? (
+              <Slider {...sliderSettings} >
+                {searchResults.map((book, index) => (
+                  <Box
+                    key={index}
+                    sx={style.bookBox}
+                    onClick={() => handleBookClick(book)}
+                  >
+                    {/* Mostrar imagem do livro */}
+                    <img
+                      src={book.imgURL && book.imgURL.trim() !== "" ? `/assets/${book.imgURL}.jpg` : "/assets/images.png"} // Substitua com o caminho correto da imagem
+                      alt={book.titulo}
+                      style={style.bookImage}
+                    // style={{
+                    //   width: "100%",
+                    //   height: "auto",
+                    //   objectFit: "cover", // Faz a imagem cobrir toda a área da box sem distorção
+                    //   borderRadius: "4px",
+                    // }}
+                    />
+                    {/* Exibir o título do livro abaixo da imagem */}
+                    <Typography sx={style.bookTitle}>{book.titulo}</Typography>
+                  </Box>
+                ))}
+              </Slider>
+            ) : (
+              <Typography>Nenhum resultado encontrado.</Typography>
+            )}
           </Box>
+
+          {/* Caixa de diálogo */}
+          <Dialog open={Boolean(selectedBook)} onClose={handleCloseDialog}>
+            {selectedBook && (
+              <>
+                <DialogTitle>{selectedBook.titulo}</DialogTitle>
+                <DialogContent sx={style.dialogContent}>
+                  {/* Imagem do livro */}
+                  <img
+                    src={selectedBook.imgURL && selectedBook.imgURL.trim() !== "" ? `/assets/${selectedBook.imgURL}.jpg` : "/assets/images.png" }
+                    alt={selectedBook.titulo}
+                    style={style.dialogImage}
+                  />
+                  {/* Detalhes do livro */}
+                  <Box sx={style.dialogText}>
+                    <Typography variant="h6">Autor: {selectedBook.autor}</Typography>
+                    <Typography>Editor(a): {selectedBook.editora}</Typography>
+                    <Typography>Ano de Publicação: {selectedBook.anoPublicacao}</Typography>
+                    <Typography>ISBN: {selectedBook.isbn}</Typography>
+                    <Typography>Disponível: {selectedBook.disponivel ? "Sim" : "Não"}</Typography>
+                    {selectedBook.tipo === "Fisico" && (
+                      <Typography>Quantidade: {selectedBook.quantidade}</Typography>
+                    )}
+                  </Box>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleCloseDialog} sx={style.dialogButton}>Voltar</Button>
+                  <Button onClick={handleRequestBook} sx={style.dialogButton} variant="contained">
+                    Solicitar
+                  </Button>
+                </DialogActions>
+              </>
+            )}
+          </Dialog>
+        </Box>
       )}
-        </PageWrapper>
-      );
+    </PageWrapper>
+  );
 }
