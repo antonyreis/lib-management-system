@@ -1,4 +1,4 @@
-// src/services/userws.js
+// src/services/bookws.js
 
 import axios from "axios";
 
@@ -56,16 +56,6 @@ export const getLivroById = async (id) => {
     throw error;
   }
 };
-
-// export const getUsuarioByEmail = async (email) => {
-//   try {
-//     const response = await axios.get(`${API_URL}/email/${email}`);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Erro ao buscar usuário", error);
-//     throw error;
-//   }
-// };
 
 export const addLivro = async (userData) => {
   try {
