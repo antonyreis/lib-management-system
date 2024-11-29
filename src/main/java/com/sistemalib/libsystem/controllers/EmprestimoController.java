@@ -18,7 +18,7 @@ import com.sistemalib.libsystem.repositories.ClienteRepository;
 import com.sistemalib.libsystem.repositories.FuncionarioRepository;
 
 @RestController
-@RequestMapping(value = "/loans")
+@RequestMapping(value = "/emprestimos")
 public class EmprestimoController {
 
     @Autowired
