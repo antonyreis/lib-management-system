@@ -8,7 +8,10 @@ import { deepOrange } from "@mui/material/colors";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Bookmarks from '@mui/icons-material/Bookmarks';
 import AccessibilityIcon from '@mui/icons-material/Accessibility';
+import CreditScoreIcon from '@mui/icons-material/CreditScore';
 import Search from '@mui/icons-material/Search';
+import HomeIcon from '@mui/icons-material/Home';
+import PeopleIcon from '@mui/icons-material/People';
 
 // Third-party
 import { useLocation, useNavigate } from "react-router-dom";
@@ -94,6 +97,11 @@ export default function CustomAppBar() {
     navigate("/menu");
   };
 
+  const handleClickLoan = () => {
+    // sessionStorage.setItem("isAuthenticated", "false");
+    navigate("/loan");
+  };
+
   const userData = JSON.parse(sessionStorage.getItem("usuario") || {})
 
   return (
@@ -102,7 +110,7 @@ export default function CustomAppBar() {
         <div style={style.appBarFirstBox}>
           <Tooltip title="Menu Principal" arrow>
             <IconButton onClick={handleClickMenu} sx={style.avatar}>
-              <Search />
+              <HomeIcon />
             </IconButton>
           </Tooltip>
         </div>
@@ -110,10 +118,15 @@ export default function CustomAppBar() {
           {(userData.cargo === "Administrador") && (
             <Tooltip title="Central de Usuários" arrow>
               <IconButton onClick={handleClickUser} sx={style.avatar}>
-                <AccessibilityIcon />
+                <PeopleIcon />
               </IconButton>
             </Tooltip>
           )}
+          <Tooltip title="Empréstimos" arrow>
+            <IconButton onClick={handleClickLoan} sx={style.avatar}>
+              <CreditScoreIcon />
+            </IconButton>
+          </Tooltip>
           {(userData.cargo !== "Cliente") && (
             <Tooltip title="Central de Livros" arrow>
               <IconButton onClick={handleClickBookmark} sx={style.avatar}>

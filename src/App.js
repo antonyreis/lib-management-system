@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Menu from "./pages/Menu";
 import User from "./pages/User";
 import Book from "./pages/Book";
+import Loan from "./pages/Loan";
 
 function App() {
   // const isAuthenticated = sessionStorage.getItem("isAuthenticated") === "true";
@@ -21,6 +22,8 @@ function App() {
         <Route path="/user" element= {<User />} />
 
         <Route path="/book" element= {<Book />} />
+
+        <Route path="/loan" element= {<Loan />} />
 
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
