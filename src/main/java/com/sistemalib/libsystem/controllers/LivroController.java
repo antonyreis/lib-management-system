@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sistemalib.libsystem.entities.LivroFisico;
@@ -41,6 +42,18 @@ public class LivroController {
 	public List<Livro> findAll() {
 		return livroRepository.findAll();
 	}
+	
+	@GetMapping("/search")
+	public ResponseEntity<List<Livro>> buscarLivros(
+	        @RequestParam(required = false) String titulo,
+	        @RequestParam(required = false) String autor,
+	        @RequestParam(required = false) String editora,
+	        @RequestParam(required = false) Integer anoPublicacao) {
+	    List<Livro> livros = livroRepository.buscarPorFiltros(titulo, autor, editora, anoPublicacao);
+	    return ResponseEntity.ok(livros);
+	}
+
+
 	
 	@GetMapping(value = "/digitals")
 	public List<LivroDigital> findAllDigital() {

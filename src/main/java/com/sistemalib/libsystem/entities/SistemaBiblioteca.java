@@ -1,4 +1,6 @@
 package com.sistemalib.libsystem.entities;
+import com.sistemalib.libsystem.controllers.EmprestimoController;
+
 
 import java.util.List;
 import java.util.Map;
@@ -17,9 +19,28 @@ public class SistemaBiblioteca {
     
     @Autowired
     private LivroController livroController;
+    
+    @Autowired
+    private EmprestimoController emprestimoController;
   
     // ITERAÇÃO SOBRE USUÁRIOS E SUBCLASSES
     
+    public String solicitarEmprestimo(Map<String, Object> requestData) {
+        return emprestimoController.solicitarEmprestimo(requestData).getBody();
+    }
+
+    public String registrarEmprestimo(Map<String, Object> requestData) {
+        return emprestimoController.registrarEmprestimo(requestData).getBody();
+    }
+
+    public List<Emprestimo> listarEmprestimos() {
+        return emprestimoController.listarEmprestimos();
+    }
+
+    public List<Emprestimo> listarEmprestimosPorCliente(Long clienteId) {
+        return emprestimoController.listarEmprestimosPorCliente(clienteId);
+    }
+
     public Usuario cadastrarUsuario(Map<String, Object> userData) {
         return usuarioController.insert(userData);
     }
