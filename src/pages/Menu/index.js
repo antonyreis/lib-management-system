@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import Slider from "react-slick";
+import axios from "axios";
+import * as loanws from "../../services/loanws";
 
 // Design
 import Box from "@mui/material/Box";
@@ -104,20 +106,26 @@ export default function Home() {
   const [searchResults, setSearchResults] = useState([]);
   const [selectedBook, setSelectedBook] = useState(null);
   const [searchValue, setSearchValue] = useState("");
-  
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const userData = JSON.parse(sessionStorage.getItem("usuario") || {})
+  console.log({ userData: userData })
+
   useEffect(() => {
     let filteredBooks = books;
 
     if (searchValue.trim() !== "") {
-        if (searchMethod === "id") {
-            filteredBooks = filteredBooks.filter((book) => book.isbn.includes(searchValue));
-        } else if (searchMethod === "titulo") {
-            filteredBooks = filteredBooks.filter((book) => book.titulo.toLowerCase().includes(searchValue.toLowerCase()));
-        }
+      if (searchMethod === "id") {
+        filteredBooks = filteredBooks.filter((book) => book.isbn.includes(searchValue));
+      } else if (searchMethod === "titulo") {
+        filteredBooks = filteredBooks.filter((book) => book.titulo.toLowerCase().includes(searchValue.toLowerCase()));
+      }
     }
 
     setSearchResults(filteredBooks);
-}, [searchMethod, searchValue, books]);
+    console.log({ sessionStorage: sessionStorage })
+  }, [searchMethod, searchValue, books]);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -140,6 +148,19 @@ export default function Home() {
     setSearchResults(results);
   };
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/users");
+        setUsers(response.data); // Assuma que a API retorna uma lista de usuários
+      } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
   const handleSearchMethodChange = (event) => setSearchMethod(event.target.value);
 
   const handleBookClick = (book) => {
@@ -150,10 +171,33 @@ export default function Home() {
     setSelectedBook(null);
   };
 
-  const handleRequestBook = () => {
-    console.log("Solicitar livro:", selectedBook);
-    // Aqui você pode implementar a lógica para solicitar o livro
-  };
+  const handleRequestBook = async () => {
+    if (!selectedBook) return;
+
+    // const payload = {
+    //   livroId: parseInt(selectedBook.id),
+    //   userId: parseInt(userData.id),
+    // };
+
+    console.log({selectedBook})
+    const loanData = {
+      livroId: parseInt(selectedBook.id),
+      clienteId: parseInt(userData.id),
+    };
+
+    try {
+      const result = await loanws.solicitarEmprestimo(loanData);
+      alert(result);  // Exibe a mensagem de sucesso
+      loanws.listarEmprestimos();
+      window.location.reload();
+    } catch (error) {
+      alert("Erro ao solicitar empréstimo.");
+    }
+  }
+
+
+  // const userData = JSON.parse(sessionStorage.getItem("usuario") || {})
+  // console.log({ userData: userData })
 
   const sliderSettings = {
     useCSS: true,
@@ -260,7 +304,7 @@ export default function Home() {
                 <DialogContent sx={style.dialogContent}>
                   {/* Imagem do livro */}
                   <img
-                    src={selectedBook.imgURL && selectedBook.imgURL.trim() !== "" ? `/assets/${selectedBook.imgURL}.jpg` : "/assets/images.png" }
+                    src={selectedBook.imgURL && selectedBook.imgURL.trim() !== "" ? `/assets/${selectedBook.imgURL}.jpg` : "/assets/images.png"}
                     alt={selectedBook.titulo}
                     style={style.dialogImage}
                   />
