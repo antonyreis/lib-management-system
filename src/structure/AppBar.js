@@ -103,6 +103,7 @@ export default function CustomAppBar() {
   };
 
   const userData = JSON.parse(sessionStorage.getItem("usuario") || {})
+  console.log({userData: userData})
 
   return (
     <>
@@ -122,11 +123,13 @@ export default function CustomAppBar() {
               </IconButton>
             </Tooltip>
           )}
-          <Tooltip title="Empréstimos" arrow>
-            <IconButton onClick={handleClickLoan} sx={style.avatar}>
-              <CreditScoreIcon />
-            </IconButton>
-          </Tooltip>
+          {(userData.cargo === "Administrador" || userData.cargo === "Funcionario" ) && (
+            <Tooltip title="Empréstimos" arrow>
+              <IconButton onClick={handleClickLoan} sx={style.avatar}>
+                <CreditScoreIcon />
+              </IconButton>
+            </Tooltip>
+          )}
           {(userData.cargo !== "Cliente") && (
             <Tooltip title="Central de Livros" arrow>
               <IconButton onClick={handleClickBookmark} sx={style.avatar}>
