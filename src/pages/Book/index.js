@@ -101,6 +101,7 @@ export default function Home() {
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openConfirmDeleteDialog, setOpenConfirmDeleteDialog] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
+    const [file, setFile] = useState(null);
     const [form, setForm] = useState({ titulo: "", autor: "", editora: "", anoPublicacao: "", ISBN: "", tipo: "", imgURL: "" });
 
 
@@ -173,6 +174,24 @@ export default function Home() {
                 }
 
                 form.anoPublicacao = parseInt(form.anoPublicacao, 10) || 0;
+
+                console.log({form})
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        // Simulação de salvar localmente em "/assets"
+                        const base64Data = reader.result; // Dados da imagem em Base64
+                        const filename = `/assets/${file.name}`;
+                        console.log("Salvando imagem em:", filename);
+
+                        // Aqui você precisaria de uma API ou lógica no backend para armazenar o arquivo real
+                        // Simulação:
+                        console.log("Imagem salva:", base64Data);
+                    };
+                    reader.readAsDataURL(file);
+                }
+
                 await bookws.addLivro(form);
                 setBooks([...books, form]);
                 setSearchResults([...searchResults, form]);
@@ -188,6 +207,9 @@ export default function Home() {
                     imgURL: "",
                     quantidade: 0
                 });
+                
+                setFile(null);
+
                 window.location.reload();
                 handleCloseDialog();
             } catch (error) {
@@ -354,23 +376,22 @@ export default function Home() {
                             <TextField sx={style.textfieldDialog} label="Editora" fullWidth value={form.editora} onChange={(e) => setForm({ ...form, editora: e.target.value })} />
                             <TextField sx={style.textfieldDialog} label="Ano de Publicação" fullWidth value={form.anoPublicacao} onChange={(e) => setForm({ ...form, anoPublicacao: e.target.value })} />
                             <TextField sx={style.textfieldDialog} label="ISBN" fullWidth value={form.ISBN} onChange={(e) => setForm({ ...form, ISBN: e.target.value })} />
-                            <TextField
+                            {/* <TextField
                                 type="file"
                                 sx={style.textfieldDialog}
                                 label="Imagem do Livro"
                                 InputLabelProps={{ shrink: true }}
                                 fullWidth
                                 onChange={(e) => {
-                                    const file = e.target.files[0];
-                                    if (file) {
-                                        const imgURL = URL.createObjectURL(file); // URL temporária
-                                        setForm({ ...form, imgURL });
-                                        // Aqui você pode fazer um upload para o servidor ou salvar localmente
-                                        console.log("Imagem selecionada:", file.name);
-                                        console.log("URL DA IMAGEM: ", imgURL)
+                                    const selectedFile = e.target.files[0];
+                                    if (selectedFile) {
+                                        console.log({form})
+                                        console.log({selectedFile})
+                                        setFile(selectedFile)
+                                        setForm({ ...form, imgURL: selectedFile.name });
                                     }
                                 }}
-                            />
+                            /> */}
                             <FormControl fullWidth sx={{ marginTop: '10px' }}>
                                 <InputLabel sx={{
                                     color: '#393536',
