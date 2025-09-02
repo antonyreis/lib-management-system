@@ -1,9 +1,8 @@
 # 📚 Sistema de Gerenciamento de Biblioteca
 
 ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
-![License](https://img.shields.io/github/license/antonyreis/lib-management-system)
-![React](https://img.shields.io/badge/React-18.2.0-blue)
-![Node.js](https://img.shields.io/badge/Node.js-18.17.0-green)
+![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black)
+![Java](https://img.shields.io/badge/Java-ED8B00?style=flat&logo=openjdk&logoColor=white)  
 
 Sistema completo para gerenciamento de bibliotecas, composto por uma API backend desenvolvida com conceitos de Programação Orientada a Objetos e uma interface frontend moderna em React.
 
